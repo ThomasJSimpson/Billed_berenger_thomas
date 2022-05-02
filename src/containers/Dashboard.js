@@ -20,7 +20,6 @@ export const filteredBills = (data, status) => {
           const userEmail = JSON.parse(localStorage.getItem("user")).email;
           selectCondition = bill.status === status && ![...USERS_TEST, userEmail].includes(bill.email);
         }
-
         return selectCondition;
       })
     : [];
@@ -88,15 +87,15 @@ export default class {
     if (this.counter % 2 === 0) {
       bills.forEach((b) => {
         $(`#open-bill${b.id}`).css({ background: "#0D5AE5" });
-        console.log($(`#open-bill${b.id}`));
       });
       $(`#open-bill${bill.id}`).css({ background: "#2A2B35" });
+      console.log($(`#open-bill${bill.id}`).css({ background: "#2A2B35" }));
       $(".dashboard-right-container div").html(DashboardFormUI(bill));
       $(".vertical-navbar").css({ height: "150vh" });
       this.counter++;
     } else {
       $(`#open-bill${bill.id}`).css({ background: "#0D5AE5" });
-
+      this.id = "";
       $(".dashboard-right-container div").html(`
         <div id="big-billed-icon" data-testid="big-billed-icon"> ${BigBilledIcon} </div>
       `);
@@ -129,19 +128,26 @@ export default class {
   };
 
   handleShowTickets(e, bills, index) {
-    if (this.counter === undefined || this.index !== index) this.counter = 0;
+    if (this[`counter${index}`] === undefined) this[`counter${index}`] = 0;
     if (this.index === undefined || this.index !== index) this.index = index;
-    if (this.counter % 2 === 0) {
+    console.log(filteredBills(bills, getStatus(this.index)));
+
+    if (this[`counter${index}`] % 2 === 0) {
       $(`#arrow-icon${this.index}`).css({ transform: "rotate(0deg)" });
       $(`#status-bills-container${this.index}`).html(cards(filteredBills(bills, getStatus(this.index))));
-      this.counter++;
+
+      if (this.id) {
+        $(`#open-bill${this.id}`).css({ background: "#2A2B35" });
+      }
+
+      this[`counter${index}`]++;
     } else {
       $(`#arrow-icon${this.index}`).css({ transform: "rotate(90deg)" });
       $(`#status-bills-container${this.index}`).html("");
-      this.counter++;
+      this[`counter${index}`]++;
     }
 
-    bills.forEach((bill) => {
+    filteredBills(bills, getStatus(this.index)).forEach((bill) => {
       $(`#open-bill${bill.id}`).click((e) => this.handleEditTicket(e, bill, bills));
     });
 
@@ -154,8 +160,6 @@ export default class {
         .bills()
         .list()
         .then((snapshot) => {
-          console.log(snapshot);
-
           const bills = snapshot.map((doc) => ({
             id: doc.id,
             ...doc,

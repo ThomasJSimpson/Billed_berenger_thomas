@@ -2,10 +2,30 @@ import { ROUTES_PATH } from "../constants/routes.js";
 import { formatDate, formatStatus } from "../app/format.js";
 import Logout from "./Logout.js";
 
+
+
+
+
+
+
 export function sortEarly(arr) {
   const antiChrono = (a, b) => (a.date < b.date ? 1 : -1);
   arr = arr.sort(antiChrono);
 }
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 export default class {
   constructor({ document, onNavigate, store, localStorage }) {
@@ -39,13 +59,14 @@ export default class {
         .bills()
         .list()
         .then((snapshot) => {
+          
           // tri
 
           sortEarly(snapshot);
 
+          
           const bills = snapshot.map((doc) => {
             try {
-
               return {
                 ...doc,
                 date: formatDate(doc.date),
@@ -65,8 +86,7 @@ export default class {
             }
           });
           
-/*           console.log("length", bills.length); 
- */          return bills;
+         return bills;
         });
     }
   };
